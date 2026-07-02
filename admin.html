@@ -203,7 +203,44 @@
         .loading-screen p {
             color: rgba(255, 255, 255, 0.5);
         }
+        /* Clear All Button */
+        .clear-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #ff4d6d, #c9184a);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(201, 24, 74, 0.3);
+        }
 
+        .clear-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(201, 24, 74, 0.5);
+            background: linear-gradient(135deg, #ff6b81, #e0003b);
+        }
+
+        .clear-all-btn:active {
+            transform: scale(0.96);
+        }
+
+        .clear-all-btn.loading {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .clear-wrapper {
+            text-align: center;
+        }
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -263,6 +300,10 @@
         </div>
     </div>
 
+    <div class="clear-wrapper" id="clearWrapper" style="display:none;">
+        <button class="clear-all-btn" id="clearAllBtn">🗑️ Clear All Invitations</button>
+    </div>
+
     <div class="invitations-grid" id="invitationsGrid">
         <div class="loading-screen" id="loading">
             <div class="spinner"></div>
@@ -309,6 +350,7 @@
 
                 // Show stats bar
                 document.getElementById('statsBar').style.display = 'flex';
+                document.getElementById('clearWrapper').style.display = 'block';
                 document.getElementById('totalCount').textContent = docs.length;
 
                 // Count unique names
@@ -316,8 +358,9 @@
                 const nameStatLabel = document.querySelector('.stat-box:nth-child(5) .stat-label');
                 const nameStatNumber = document.querySelector('.stat-box:nth-child(5) .stat-number');
 
-                // Count today's invitations
-                const todayStr = new Date().toISOString().split('T')[0];
+                // Count today's invitations (local timezone)
+                const now = new Date();
+                const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
                 const todayDocs = docs.filter(d => d.date === todayStr);
                 document.getElementById('todayCount').textContent = todayDocs.length;
 
@@ -399,6 +442,31 @@
                         <p>Could not load invitations.<br><small>${err.message}</small></p>
                     </div>`;
             });
+        // Clear All Invitations
+        document.getElementById('clearAllBtn').addEventListener('click', function() {
+            if (!confirm('⚠️ Are you sure you want to delete ALL invitations?\n\nThis cannot be undone!')) return;
+
+            const btn = this;
+            btn.classList.add('loading');
+            btn.textContent = '🗑️ Deleting...';
+
+            db.collection('invitations').get()
+                .then(snapshot => {
+                    const batch = db.batch();
+                    snapshot.forEach(doc => batch.delete(doc.ref));
+                    return batch.commit();
+                })
+                .then(() => {
+                    btn.textContent = '✅ All Deleted!';
+                    setTimeout(() => { location.reload(); }, 1000);
+                })
+                .catch(err => {
+                    console.error('Error clearing:', err);
+                    btn.classList.remove('loading');
+                    btn.textContent = '❌ Error — Try Again';
+                    setTimeout(() => { btn.textContent = '🗑️ Clear All Invitations'; }, 2000);
+                });
+        });
     </script>
 </body>
 
