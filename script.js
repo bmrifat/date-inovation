@@ -38,6 +38,8 @@ document.addEventListener('click', playMusic, { once: true });
 function render(html) {
     app.innerHTML = html;
     app.className = 'container fade-in';
+    app.scrollTop = 0;
+    window.scrollTo(0, 0);
 }
 
 function fireConfetti() {
@@ -469,7 +471,7 @@ function openCalendar() {
     popup.style.left = rect.left + 'px';
     popup.style.top = (rect.bottom + 10) + 'px';
 
-    // Adjust if overflowing right
+    // Adjust if overflowing — handle mobile centering
     requestAnimationFrame(() => {
         const pr = popup.getBoundingClientRect();
         if (pr.right > window.innerWidth - 10) {
@@ -477,6 +479,11 @@ function openCalendar() {
         }
         if (pr.left < 10) {
             popup.style.left = '15px';
+        }
+        // On small screens, center the calendar
+        if (window.innerWidth <= 600) {
+            popup.style.left = '50%';
+            popup.style.transform = 'translateX(-50%)';
         }
     });
 }

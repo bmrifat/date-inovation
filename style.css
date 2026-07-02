@@ -37,6 +37,7 @@ body::before {
     z-index: 2;
     width: 420px;
     max-width: 92%;
+    max-height: 92vh;
     padding: 40px 30px;
     text-align: center;
     background: rgba(255, 255, 255, .12);
@@ -45,6 +46,18 @@ body::before {
     border: 1px solid rgba(255, 255, 255, .22);
     border-radius: 30px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, .3);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 77, 136, .4) transparent;
+}
+
+.container::-webkit-scrollbar {
+    width: 5px;
+}
+
+.container::-webkit-scrollbar-thumb {
+    background: rgba(255, 77, 136, .4);
+    border-radius: 10px;
 }
 
 .fade-in {
@@ -381,20 +394,7 @@ p {
    ================================ */
 .letter-screen {
     padding: 10px 0;
-    max-height: 78vh;
-    overflow-y: auto;
     overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 77, 136, .4) transparent;
-}
-
-.letter-screen::-webkit-scrollbar {
-    width: 5px;
-}
-
-.letter-screen::-webkit-scrollbar-thumb {
-    background: rgba(255, 77, 136, .4);
-    border-radius: 10px;
 }
 
 .letter-card {
@@ -430,8 +430,8 @@ p {
    6-7. PICK PAGES (Date / Food / Activity)
    ================================ */
 .scroll-page {
-    width: 480px;
-    max-width: 95%;
+    width: 100%;
+    max-width: 100%;
     max-height: 85vh;
     overflow-y: auto;
     overflow-x: hidden;
@@ -540,6 +540,12 @@ p {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
+}
+
+@media(max-width:600px) {
+    .cal-popup.cal-open {
+        transform: translateX(-50%) scale(1);
+    }
 }
 
 .cal-header {
@@ -1054,19 +1060,38 @@ p {
    ================================ */
 @media(max-width:600px) {
     .container {
-        padding: 30px 20px;
+        padding: 24px 16px;
+        max-height: 100vh;
+        border-radius: 22px;
     }
 
     .cat {
-        width: 140px;
+        width: 120px;
     }
 
     h1 {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
+    }
+
+    p {
+        font-size: .85rem;
+        margin-bottom: 20px;
     }
 
     .typewriter {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+    }
+
+    .welcome-title {
+        font-size: 1.6rem;
+    }
+
+    .welcome-emoji {
+        font-size: 3rem;
+    }
+
+    .success-emoji {
+        font-size: 2.8rem;
     }
 
     .buttons {
@@ -1080,11 +1105,173 @@ p {
 
     .card-grid {
         grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px;
+    }
+
+    .select-card {
+        padding: 10px 4px;
+    }
+
+    .card-emoji {
+        font-size: 1.5rem;
+    }
+
+    .card-text {
+        font-size: .65rem;
     }
 
     .scroll-page {
         max-width: 100%;
+        padding: 0;
     }
+
+    .cal-popup {
+        width: 280px;
+        left: 50% !important;
+        transform: translateX(-50%) scale(0.85);
+    }
+
+    .cal-popup.cal-open {
+        transform: translateX(-50%) scale(1);
+    }
+
+    .glow-btn {
+        padding: 12px 28px;
+        font-size: .9rem;
+    }
+
+    .letter-card {
+        padding: 20px 16px;
+        margin-bottom: 20px;
+    }
+
+    .letter-text {
+        font-size: .82rem;
+        line-height: 1.7;
+    }
+
+    .gallery-grid {
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .gallery-item {
+        border-radius: 12px;
+    }
+
+    .gallery-overlay {
+        font-size: .65rem;
+        padding: 5px;
+    }
+
+    .summary-cards {
+        gap: 8px;
+        margin: 14px 0;
+    }
+
+    .summary-card {
+        padding: 10px 14px;
+        min-width: 90px;
+    }
+
+    .summary-value {
+        font-size: .78rem;
+        word-break: break-word;
+    }
+
+    .see-you {
+        font-size: 1.1rem;
+        margin-top: 14px;
+    }
+
+    .gift-box {
+        width: 110px;
+        height: 110px;
+        margin: 18px auto;
+    }
+
+    .gift-lid {
+        font-size: 3.5rem;
+    }
+
+    .gift-body {
+        font-size: 4rem;
+    }
+
+    .date-picker-wrap {
+        width: 100%;
+    }
+
+    .name-input {
+        font-size: .85rem;
+        padding: 11px 14px;
+    }
+}
+
+@media(max-width:375px) {
+    .container {
+        padding: 20px 14px;
+    }
+
+    h1 {
+        font-size: 1.15rem;
+    }
+
+    .typewriter {
+        font-size: 1.05rem;
+    }
+
+    .welcome-title {
+        font-size: 1.4rem;
+    }
+
+    .card-grid {
+        gap: 6px;
+    }
+
+    .select-card {
+        padding: 8px 3px;
+        border-radius: 12px;
+    }
+
+    .card-emoji {
+        font-size: 1.3rem;
+    }
+
+    .card-text {
+        font-size: .6rem;
+    }
+
+    .glow-btn {
+        padding: 11px 24px;
+        font-size: .85rem;
+    }
+
+    .summary-card {
+        min-width: 80px;
+        padding: 8px 10px;
+    }
+
+    .summary-emoji {
+        font-size: 1.4rem;
+    }
+
+    .summary-label {
+        font-size: .6rem;
+    }
+
+    .summary-value {
+        font-size: .72rem;
+    }
+
+    .gallery-item {
+        border-radius: 10px;
+    }
+
+    .letter-text {
+        font-size: .78rem;
+    }
+}
 
     .cal-popup {
         width: 275px;
