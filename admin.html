@@ -203,6 +203,7 @@
         .loading-screen p {
             color: rgba(255, 255, 255, 0.5);
         }
+
         /* Clear All Button */
         .clear-all-btn {
             display: inline-flex;
@@ -241,6 +242,7 @@
         .clear-wrapper {
             text-align: center;
         }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -360,7 +362,7 @@
 
                 // Count today's invitations (local timezone)
                 const now = new Date();
-                const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+                const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
                 const todayDocs = docs.filter(d => d.date === todayStr);
                 document.getElementById('todayCount').textContent = todayDocs.length;
 
@@ -443,7 +445,7 @@
                     </div>`;
             });
         // Clear All Invitations
-        document.getElementById('clearAllBtn').addEventListener('click', function() {
+        document.getElementById('clearAllBtn').addEventListener('click', function () {
             if (!confirm('⚠️ Are you sure you want to delete ALL invitations?\n\nThis cannot be undone!')) return;
 
             const btn = this;

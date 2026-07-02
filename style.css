@@ -381,6 +381,20 @@ p {
    ================================ */
 .letter-screen {
     padding: 10px 0;
+    max-height: 78vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 77, 136, .4) transparent;
+}
+
+.letter-screen::-webkit-scrollbar {
+    width: 5px;
+}
+
+.letter-screen::-webkit-scrollbar-thumb {
+    background: rgba(255, 77, 136, .4);
+    border-radius: 10px;
 }
 
 .letter-card {
