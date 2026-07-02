@@ -181,8 +181,8 @@ function showChooseDate() {
             <h1>Choose Our Date ❤️</h1>
             <p>I can't wait to spend time with you 🥰</p>
 
-            <label class="section-label">� What's your name?</label>
-            <input type="text" id="nameInput" class="name-input" placeholder="Type your name..." maxlength="30">
+            <label class="section-label">💕 What should I call you?</label>
+            <input type="text" id="nameInput" class="name-input" placeholder="What name do you want me to use?" maxlength="30">
 
             <label class="section-label">�📅 Pick a Date</label>
             <input type="hidden" id="date" value="">
