@@ -1,24 +1,33 @@
 // =============================================
+// APP STATE (centralized — no more scattered globals)
+// =============================================
+const State = {
+    selectedDate: '',
+    selectedFood: '',
+    selectedActivity: '',
+    userName: '',
+    calMonth: null,
+    calYear: null
+};
+
+// =============================================
 // GLOBAL HELPERS
 // =============================================
 
-// Firebase init
-const firebaseConfig = {
-    apiKey: "AIzaSyCKmH63bIXMjasE5FDZ5baqgw8KVT07hhc",
-    authDomain: "date-invitation-1cd66.firebaseapp.com",
-    projectId: "date-invitation-1cd66",
-    storageBucket: "date-invitation-1cd66.firebasestorage.app",
-    messagingSenderId: "321188338430",
-    appId: "1:321188338430:web:362175d10ca55b9e14e3af",
-    measurementId: "G-MWVCS8TW3J"
-};
+// Firebase init (config loaded from config.js)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const app = document.getElementById('app');
 const heartsContainer = document.querySelector('.hearts');
+let heartIntervalId = null;
 
+// =============================================
+// FLOATING HEARTS (memory-safe, capped at 15)
+// =============================================
 function createHeart() {
+    if (!heartsContainer) return;
+    if (heartsContainer.children.length >= 15) return;
     const heart = document.createElement("span");
     heart.innerHTML = "❤️";
     heart.style.left = Math.random() * 100 + "vw";
@@ -27,7 +36,15 @@ function createHeart() {
     heartsContainer.appendChild(heart);
     setTimeout(() => heart.remove(), 8000);
 }
-setInterval(createHeart, 300);
+
+function startHearts() {
+    for (let i = 0; i < 5; i++) setTimeout(createHeart, i * 200);
+    heartIntervalId = setInterval(createHeart, 800);
+}
+
+function stopHearts() {
+    if (heartIntervalId) { clearInterval(heartIntervalId); heartIntervalId = null; }
+}
 
 function playMusic() {
     const music = document.getElementById('bgMusic');
@@ -172,10 +189,8 @@ function showLoveLetter() {
 }
 
 // =============================================
-// SCREEN 6 — CHOOSE DATE
+// SCREEN 6 — CHOOSE DATE / FOOD / NAME
 // =============================================
-let selectedDate = '';
-let userName = '';
 
 function showChooseDate() {
     render(`
@@ -186,7 +201,7 @@ function showChooseDate() {
             <label class="section-label">💕 What should I call you?</label>
             <input type="text" id="nameInput" class="name-input" placeholder="What name do you want me to use?" maxlength="30">
 
-            <label class="section-label">�📅 Pick a Date</label>
+            <label class="section-label">📅 Pick a Date</label>
             <input type="hidden" id="date" value="">
             <div class="date-picker-wrap" id="datePickerWrap">
                 <div class="date-display" id="dateDisplay">Tap to pick a date...</div>
@@ -233,13 +248,13 @@ function showChooseDate() {
     document.addEventListener('click', onDocClick);
 
     document.getElementById('dateNextBtn').addEventListener('click', () => {
-        selectedDate = document.getElementById('date').value;
+        State.selectedDate = document.getElementById('date').value;
         const food = document.querySelector('#foodGrid .select-card.selected');
-        if (!selectedDate) { shakeEl('datePickerWrap'); return; }
+        if (!State.selectedDate) { shakeEl('datePickerWrap'); return; }
         if (!food) { shakeEl('foodGrid'); return; }
-        selectedFood = food.getAttribute('data-value');
-        userName = document.getElementById('nameInput').value.trim();
-        if (!userName) { shakeEl('nameInput'); return; }
+        State.selectedFood = food.getAttribute('data-value');
+        State.userName = document.getElementById('nameInput').value.trim();
+        if (!State.userName) { shakeEl('nameInput'); return; }
         showChooseFood();
     });
 }
@@ -264,8 +279,6 @@ function shakeEl(id) {
 // =============================================
 // SCREEN 7 — CHOOSE ACTIVITY
 // =============================================
-let selectedFood = '';
-let selectedActivity = '';
 
 function showChooseFood() {
     render(`
@@ -292,7 +305,7 @@ function showChooseFood() {
     document.getElementById('actNextBtn').addEventListener('click', () => {
         const act = document.querySelector('#activityGrid .select-card.selected');
         if (!act) { shakeEl('activityGrid'); return; }
-        selectedActivity = act.getAttribute('data-value');
+        State.selectedActivity = act.getAttribute('data-value');
         showGallery();
     });
 }
@@ -348,8 +361,23 @@ function showGiftBox() {
 // =============================================
 // SCREEN 10 — FINAL PAGE
 // =============================================
+// =============================================
+// TOAST NOTIFICATION
+// =============================================
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, 4000);
+}
+
 function showFinal() {
-    const d = new Date(selectedDate + 'T00:00:00');
+    const d = new Date(State.selectedDate + 'T00:00:00');
     const dateFormatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
     render(`
@@ -357,7 +385,7 @@ function showFinal() {
             <div class="success-emoji">🎉</div>
             <img src="https://media.tenor.com/Qq1hnouswVwAAAAj/peach-cat-dancing.gif" class="cat">
             <h1>It's a Date! ❤️</h1>
-            <p class="date-name">Dear <strong>${userName}</strong>, here's your date plan:</p>
+            <p class="date-name">Dear <strong>${State.userName}</strong>, here's your date plan:</p>
 
             <div class="summary-cards">
                 <div class="summary-card">
@@ -368,12 +396,12 @@ function showFinal() {
                 <div class="summary-card">
                     <span class="summary-emoji">🍽️</span>
                     <span class="summary-label">Food</span>
-                    <span class="summary-value">${selectedFood}</span>
+                    <span class="summary-value">${State.selectedFood}</span>
                 </div>
                 <div class="summary-card">
                     <span class="summary-emoji">✨</span>
                     <span class="summary-label">Activity</span>
-                    <span class="summary-value">${selectedActivity}</span>
+                    <span class="summary-value">${State.selectedActivity}</span>
                 </div>
             </div>
 
@@ -383,48 +411,51 @@ function showFinal() {
 
     setTimeout(() => confetti({ particleCount: 150, spread: 120, origin: { y: 0.5 } }), 500);
 
-    // Save to Firestore
+    // Save to Firestore with error handling
     db.collection('invitations').add({
-        name: userName,
-        date: selectedDate,
+        name: State.userName,
+        date: State.selectedDate,
         dateFormatted: dateFormatted,
-        food: selectedFood,
-        activity: selectedActivity,
+        food: State.selectedFood,
+        activity: State.selectedActivity,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => console.log('✅ Saved to Firestore!'))
-        .catch(err => console.error('Firestore error:', err));
+    }).then(() => {
+        console.log('✅ Saved to Firestore!');
+    }).catch(err => {
+        console.error('Firestore error:', err);
+        showToast('⚠️ Could not save to server, but your date plan is ready!');
+    });
 }
 
 // =============================================
 // CALENDAR
 // =============================================
-let calMonth, calYear;
 const TODAY = new Date();
 const TODAY_STR = `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}-${String(TODAY.getDate()).padStart(2, '0')}`;
 
 function setupCalendar() {
-    calMonth = TODAY.getMonth();
-    calYear = TODAY.getFullYear();
+    State.calMonth = TODAY.getMonth();
+    State.calYear = TODAY.getFullYear();
 }
 
 function buildCalendarHTML() {
     const mNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const dNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const first = new Date(calYear, calMonth, 1).getDay();
-    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const first = new Date(State.calYear, State.calMonth, 1).getDay();
+    const daysInMonth = new Date(State.calYear, State.calMonth + 1, 0).getDate();
 
     let h = `<div class="cal-header">
         <button type="button" class="cal-nav cal-prev">‹</button>
-        <span class="cal-title">${mNames[calMonth]} ${calYear}</span>
+        <span class="cal-title">${mNames[State.calMonth]} ${State.calYear}</span>
         <button type="button" class="cal-nav cal-next">›</button>
     </div><div class="cal-weekdays">`;
     for (const d of dNames) h += `<span>${d}</span>`;
     h += `</div><div class="cal-days">`;
     for (let i = 0; i < first; i++) h += `<span class="cal-empty"></span>`;
     for (let day = 1; day <= daysInMonth; day++) {
-        const ds = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const ds = `${State.calYear}-${String(State.calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const isToday = ds === TODAY_STR;
-        const isSelected = ds === selectedDate;
+        const isSelected = ds === State.selectedDate;
         let cls = 'cal-day';
         if (ds < TODAY_STR) cls = 'cal-day disabled';
         else if (isToday && isSelected) cls = 'cal-day today selected';
@@ -453,16 +484,15 @@ function closeCalendar() {
 }
 
 function openCalendar() {
-    if (selectedDate) {
-        const sd = new Date(selectedDate + 'T00:00:00');
-        calMonth = sd.getMonth();
-        calYear = sd.getFullYear();
+    if (State.selectedDate) {
+        const sd = new Date(State.selectedDate + 'T00:00:00');
+        State.calMonth = sd.getMonth();
+        State.calYear = sd.getFullYear();
     }
     const popup = ensurePopup();
     renderCalPopup(popup);
     popup.classList.add('cal-open');
 
-    // Position popup below the date picker
     const dd = document.getElementById('dateDisplay');
     if (dd) dd.classList.add('active');
 
@@ -470,6 +500,7 @@ function openCalendar() {
     const rect = wrap.getBoundingClientRect();
     popup.style.left = rect.left + 'px';
     popup.style.top = (rect.bottom + 10) + 'px';
+    popup.style.transform = '';
 
     // Adjust if overflowing — handle mobile centering
     requestAnimationFrame(() => {
@@ -480,7 +511,6 @@ function openCalendar() {
         if (pr.left < 10) {
             popup.style.left = '15px';
         }
-        // On small screens, center the calendar
         if (window.innerWidth <= 600) {
             popup.style.left = '50%';
             popup.style.transform = 'translateX(-50%)';
@@ -493,15 +523,15 @@ function renderCalPopup(popup) {
 
     popup.querySelector('.cal-prev').addEventListener('click', (e) => {
         e.stopPropagation();
-        calMonth--;
-        if (calMonth < 0) { calMonth = 11; calYear--; }
+        State.calMonth--;
+        if (State.calMonth < 0) { State.calMonth = 11; State.calYear--; }
         renderCalPopup(popup);
     });
 
     popup.querySelector('.cal-next').addEventListener('click', (e) => {
         e.stopPropagation();
-        calMonth++;
-        if (calMonth > 11) { calMonth = 0; calYear++; }
+        State.calMonth++;
+        if (State.calMonth > 11) { State.calMonth = 0; State.calYear++; }
         renderCalPopup(popup);
     });
 
@@ -510,8 +540,7 @@ function renderCalPopup(popup) {
             e.stopPropagation();
             const dv = el.getAttribute('data-date');
             document.getElementById('date').value = dv;
-            selectedDate = dv;
-            // Mark selected day visually
+            State.selectedDate = dv;
             popup.querySelectorAll('.cal-day').forEach(dd => dd.classList.remove('selected'));
             el.classList.add('selected');
             const d = new Date(dv + 'T00:00:00');
@@ -530,4 +559,5 @@ function renderCalPopup(popup) {
 // =============================================
 // START
 // =============================================
+startHearts();
 showLoading();

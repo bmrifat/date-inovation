@@ -1,8 +1,6 @@
 /* ================================
    BASE
    ================================ */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap');
-
 * {
     margin: 0;
     padding: 0;
@@ -15,7 +13,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background: linear-gradient(-45deg, #1a0a2e, #2d1b4e, #4a1942, #16213e, #1a1a2e, #2d1b4e);
     background-size: 400% 400%;
     animation: gradientShift 12s ease infinite;
@@ -959,6 +958,35 @@ p {
     color: white;
     margin-top: 18px;
     font-size: 1.3rem;
+}
+
+/* ================================
+   TOAST NOTIFICATION
+   ================================ */
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(30, 15, 50, .95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 77, 136, .4);
+    border-radius: 14px;
+    padding: 14px 24px;
+    color: #fff;
+    font-size: .88rem;
+    font-weight: 500;
+    z-index: 9999;
+    opacity: 0;
+    transition: all .4s cubic-bezier(.175, .885, .32, 1.275);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+    text-align: center;
+    max-width: 90%;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* ================================
