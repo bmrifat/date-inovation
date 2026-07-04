@@ -114,10 +114,11 @@ function showDateMe() {
     `);
     typewriterEffect('tw', 'Will You Go On A Date With Me? ❤️', 60);
 
-    // No button runs away
+    // No button runs away — escapes outside the card
     const noBtn = document.getElementById('noBtn');
     function runAway() {
         noBtn.style.position = 'fixed';
+        noBtn.style.zIndex = '9999';
         noBtn.style.left = Math.random() * (window.innerWidth - 120) + 'px';
         noBtn.style.top = Math.random() * (window.innerHeight - 60) + 'px';
     }
